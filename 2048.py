@@ -9,17 +9,16 @@ pygame.display.set_caption("2048")
 fnt = pygame.font.SysFont('cambria', 42)
 
 
-
 def draw(lst):
 	for i in range(len(lst)):
 		for j in range(len(lst[i])):
 			if lst[i][j] != 0:
-				if j == 0:		x = 0;
+				if j == 0:	x = 0;
 				elif j == 1:	x = 100;
 				elif j == 2:	x = 200;
 				elif j == 3:	x = 300;
 
-				if i == 0:		y = 0;
+				if i == 0:	y = 0;
 				elif i == 1:	y = 100;
 				elif i == 2:	y = 200;
 				elif i == 3:	y = 300;
@@ -28,22 +27,21 @@ def draw(lst):
 
 				title = fnt.render(str(lst[i][j]), True, (255, 255, 255))
 
-				if len(str(lst[i][j])) == 3:		z = 15	# triple
+				if len(str(lst[i][j])) == 3:	z = 15	# triple
 				elif len(str(lst[i][j])) == 2:	z = 25	# double
 				elif len(str(lst[i][j])) == 1:	z = 35	# single
 
 				win.blit(title, (x+z, y+20));
 
 
-
 def colour(num):
 	clr = (0, 0, 0)
-	if num == 2:	clr = (255, 0, 0)
-	elif num == 4:	clr = (255, 128, 0)
-	elif num == 8:	clr = (255, 255, 0)
-	elif num == 16:	clr = (128, 255, 0)
-	elif num == 32:	clr = (0, 255, 0)
-	elif num == 64:	clr = (0, 255, 128)
+	if num == 2:		clr = (255, 0, 0)
+	elif num == 4:		clr = (255, 128, 0)
+	elif num == 8:		clr = (255, 255, 0)
+	elif num == 16:		clr = (128, 255, 0)
+	elif num == 32:		clr = (0, 255, 0)
+	elif num == 64:		clr = (0, 255, 128)
 	elif num == 128:	clr = (0, 255, 255)
 	elif num == 256:	clr = (0, 128, 255)
 	elif num == 512:	clr = (0, 0, 255)
@@ -68,8 +66,6 @@ def drawGrid(w, rows, surface):
 			pygame.draw.line(surface, (255, 255, 255), (0, y), (w, y))
 
 
-from random import randint;
-
 def randomize(lst):
 	a, b = randint(0,3), randint(0,3);
 
@@ -78,8 +74,7 @@ def randomize(lst):
 		a, b = randint(0,3), randint(0,3);
 		i += 1;
 
-	if i < 32:
-		lst[a][b] = 2;
+	if i < 32:	lst[a][b] = 2;
 
 
 def gameOver(lst):
@@ -111,7 +106,6 @@ def gameOver(lst):
 	return run;
 
 
-
 def left(lst):
 	for i in range(len(lst)):
 		for j in range(len(lst)):
@@ -138,7 +132,6 @@ def left(lst):
 		elif lst[i][2] != 0 and lst[i][3] != 0 and lst[i][2] == lst[i][3]:
 			lst[i][2] *= 2;
 			lst[i][3] = 0;
-
 
 
 def up(lst):
@@ -169,7 +162,6 @@ def up(lst):
 			lst[3][i] = 0;
 
 
-
 def right(lst):
 	for i in range(len(lst)):
 		for j in range(len(lst)):
@@ -198,7 +190,6 @@ def right(lst):
 			lst[i][0] = 0;
 
 
-
 def down(lst):
 	for i in range(len(lst)):
 		for j in range(len(lst)):
@@ -225,7 +216,6 @@ def down(lst):
 		elif lst[1][i] != 0 and lst[1][i] == lst[0][i]:
 			lst[1][i] *= 2;
 			lst[0][i] = 0;
-
 
 
 lst = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]];
@@ -275,7 +265,6 @@ while run:
 	if not gameOver(lst):
 		run = False;
 		print("Game over");
-
 
 
 pygame.quit();
