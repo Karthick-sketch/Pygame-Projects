@@ -1,2 +1,1 @@
-![2048](/2048-StartMenu.png)
-#[Snake Game](/SnakeGame-StartMenu.png)
+![2048 and Snake Game](/2048&SnakeGame.png)
