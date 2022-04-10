@@ -5,8 +5,10 @@ pygame.init()
 win = pygame.display.set_mode((400, 400))
 pygame.display.set_caption("2048")
 
-fnt = pygame.font.SysFont('cambria', 42)
-
+font24 = pygame.font.SysFont('cambria', 24)
+font32 = pygame.font.SysFont('cambria', 32)
+font42 = pygame.font.SysFont('cambria', 42)
+font72 = pygame.font.SysFont('cambria', 72)
 
 def draw(lst):
     for i in range(len(lst)):
@@ -17,7 +19,7 @@ def draw(lst):
 
                 pygame.draw.rect(win, colour(lst[i][j]), (x, y, 100, 100))
 
-                title = fnt.render(str(lst[i][j]), True, (255, 255, 255))
+                title = font42.render(str(lst[i][j]), True, (255, 255, 255))
 
                 if len(str(lst[i][j])) == 4: z = 0 # four digit number
                 elif len(str(lst[i][j])) == 3: z = 15 # triple digit number
@@ -236,17 +238,12 @@ def down(lst):
 
 def startMenu(surface, width, rows):
     surface.fill((0, 0, 0))
-    fnt1 = pygame.font.SysFont('cambria', 72)
-    fnt2 = pygame.font.SysFont('cambria', 18)
-
     start, run = False, True
-
     while run:
-        title = fnt1.render('2048', True, (255, 0, 0))
-        prompt =  fnt2.render('Press ENTER to start the game....', True, (255, 255, 255))
-
-        surface.blit(title, (110, 100))
-        surface.blit(prompt, (90, 250))
+        title = font72.render('2048', True, (255, 0, 0))
+        prompt = font24.render('Press ENTER to start the game...', True, (255, 255, 255))
+        surface.blit(title, (130, 100))
+        surface.blit(prompt, (40, 250))
 
         pygame.display.update()
 
@@ -264,13 +261,10 @@ def startMenu(surface, width, rows):
 
 def gameOver(surface, score):
     surface.fill((0, 0, 0))
-    fnt1 = pygame.font.SysFont('cambria', 64)
-    fnt2 = pygame.font.SysFont('cambria', 32)
 
-    title = fnt1.render('Game Over', True, (255, 0, 0))
-    surface.blit(title, (40, 100))
-
-    prompt = fnt2.render('Your Score: '+str(score), True, (0, 0, 255))
+    title = font72.render('Game Over', True, (255, 0, 0))
+    prompt = font32.render('Your Score: '+str(score), True, (0, 0, 255))
+    surface.blit(title, (30, 100))
     surface.blit(prompt, (100, 200))
 
     pygame.display.update()
@@ -324,6 +318,5 @@ while run:
     if not isGameOver(lst):
         run = False
         gameOver(win, score)
-
 
 pygame.quit()

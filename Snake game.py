@@ -5,45 +5,41 @@ pygame.init()
 win = pygame.display.set_mode((500, 540))
 pygame.display.set_caption("Snake game")
 
+font32 = pygame.font.SysFont('cambria', 32)
+font72 = pygame.font.SysFont('cambria', 72)
 
 class Cube(object):
-	rows = 20
-	w = 500
-	def __init__(self, start, color = (0, 255, 0)):
+	rows, w = 20, 500
+	def __init__(self, start, color=(0, 255, 0)):
 		self.pos = start
-		self.dirx = 1
-		self.diry = 0
+		self.dirx, self.diry = 1, 0
 		self.color = color
 
 	def move(self, dirx, diry):
-		self.dirx = dirx
-		self.diry = diry
+		self.dirx, self.diry = dirx, diry
 		self.pos = (self.pos[0] + dirx, self.pos[1] + diry)
 
-	def draw(self, surface, eyes = False):
+	def draw(self, surface, eyes=False):
 		dis = self.w//self.rows
-		i = self.pos[0]
-		j = self.pos[1]
+		i, j = self.pos[0], self.pos[1]
 
 		pygame.draw.rect(surface, self.color, (i*dis+1, j*dis+1, dis-2, dis-2))
+
 		if eyes:
-			centre = dis//2
-			radius = 3
+			centre, radius = dis//2, 3
 			circleMiddle = (i*dis+centre-radius, j*dis+8)
-			circleMiddle2 = (i*dis + dis-radius*2, j*dis+8)
+			circleMiddle2 = (i*dis+dis-radius*2, j*dis+8)
 			pygame.draw.circle(surface, (0, 0, 0), circleMiddle, radius)
 			pygame.draw.circle(surface, (0, 0, 0), circleMiddle2, radius)
 
 
 class Snake(object):
-	body = []
-	turns = {}
 	def __init__(self, color, pos):
 		self.color = color
 		self.head = Cube(pos)
-		self.body.append(self.head)
-		self.dirx = 0
-		self.diry = 0
+		self.body = [self.head]
+		self.turns = {}
+		self.dirx = self.diry = 0
 
 	def move(self):
 		Continue = True
@@ -53,27 +49,18 @@ class Snake(object):
 			else:
 				keys = pygame.key.get_pressed()
 
-				for key in keys:
-					if keys[pygame.K_UP] and self.diry != 1:
-						self.dirx = 0
-						self.diry = -1
-						self.turns[self.head.pos[:]] = [self.dirx, self.diry]
-
-					elif keys[pygame.K_DOWN] and self.diry != -1:
-						self.dirx = 0
-						self.diry = 1
-						self.turns[self.head.pos[:]] = [self.dirx, self.diry]
-
-					elif keys[pygame.K_LEFT] and self.dirx != 1:
-						self.dirx = -1
-						self.diry = 0
-						self.turns[self.head.pos[:]] = [self.dirx, self.diry]
-
-					elif keys[pygame.K_RIGHT] and self.dirx != -1:
-						self.dirx = 1
-						self.diry = 0
-						self.turns[self.head.pos[:]] = [self.dirx, self.diry]
-
+				if keys[pygame.K_UP] and self.diry != 1:
+					self.dirx, self.diry = 0, -1
+					self.turns[self.head.pos[:]] = [self.dirx, self.diry]
+				elif keys[pygame.K_DOWN] and self.diry != -1:
+					self.dirx, self.diry = 0, 1
+					self.turns[self.head.pos[:]] = [self.dirx, self.diry]
+				elif keys[pygame.K_LEFT] and self.dirx != 1:
+					self.dirx, self.diry = -1, 0
+					self.turns[self.head.pos[:]] = [self.dirx, self.diry]
+				elif keys[pygame.K_RIGHT] and self.dirx != -1:
+					self.dirx, self.diry = 1, 0
+					self.turns[self.head.pos[:]] = [self.dirx, self.diry]
 
 		if Continue:
 			for i, c in enumerate(self.body):
@@ -99,14 +86,10 @@ class Snake(object):
 
 	def reset(self, pos):
 		self.head = Cube(pos)
-		self.body = []
-		self.body.append(self.head)
-		self.addCube()
-		self.addCube()
+		self.body = [self.head]
+		self.addCube(); self.addCube()
 		self.turns = {}
-		self.dirx = 0
-		self.diry = 0
-
+		self.dirx = self.diry = 0
 
 	def addCube(self):
 		tail = self.body[-1]
@@ -124,22 +107,17 @@ class Snake(object):
 		self.body[-1].dirx = dx
 		self.body[-1].diry = dy
 
-
 	def draw(self, surface):
 		for i, c in enumerate(self.body):
-			if i == 0:
-				c.draw(surface, True)
-			else:
-				c.draw(surface)
+			c.draw(surface, i == 0)
 
 
 def redrawWindow(surface):
 	global width, s, snk
 	surface.fill((0, 0, 0))
-	s.draw(surface)
-	snk.draw(surface)
+	s.draw(surface); snk.draw(surface)
 	pygame.draw.line(surface, (0, 0, 255), (0, width), (width, width))
-	text = font.render('Score: {}'.format(len(s.body)-3), True, (0, 0, 255))
+	text = font32.render('Score: {}'.format(len(s.body)-3), True, (0, 0, 255))
 	win.blit(text, (10, 500))
 
 	pygame.display.update()
@@ -149,84 +127,75 @@ def snack(rows, item):
 	position = item.body
 	run = True
 	while run:
-		x = randrange(rows)
-		y = randrange(rows)
-		if len(list(filter(lambda z:z.pos == (x,y), position))) > 0:
+		pos = (randrange(rows), randrange(rows))
+		if len(list(filter(lambda z:z.pos == pos, position))) > 0:
 			continue
 		else:
 			run = False
 
-	return (x, y)
+	return pos
 
 
 def startMenu(surface):
 	surface.fill((0, 0, 0))
-	fnt1 = pygame.font.SysFont('cambria', 72)
-	fnt2 = pygame.font.SysFont('cambria', 16)
-
-	start = False
-	run = True
+	start, run = False, True
 	dis = width//rows
 
 	while run:
-		title = fnt1.render('Snake Game', True, (0, 255, 0))
-		surface.blit(title, (50, 100))
+		title = font72.render('Snake Game', True, (0, 255, 0))
+		surface.blit(title, (60, 100))
 
+		# Head
 		pygame.draw.rect(surface, (0, 255, 0), (10*dis-25, 10*dis+1, dis-2, dis-2))
 
+		# Eyes
 		pygame.draw.circle(surface, (0, 0, 0), (10*dis-8, 10*dis+8), 3)
 		pygame.draw.circle(surface, (0, 0, 0), (10*dis-17, 10*dis+8), 3)
 
+		# Body
 		pygame.draw.rect(surface, (0, 255, 0), (10*dis-50, 10*dis+1, dis-2, dis-2))
 		pygame.draw.rect(surface, (0, 255, 0), (10*dis-75, 10*dis+1, dis-2, dis-2))
 
+		# Food
 		pygame.draw.rect(surface, (255, 0, 0), (10*dis+25, 10*dis+1, dis-2, dis-2))
 
-		prompt =  fnt2.render('Press ENTER to start the game....', True, (255, 0, 0))
-		surface.blit(prompt, (125, 350))
+		prompt = font32.render('Press ENTER to start the game...', True, (0, 0, 255))
+		surface.blit(prompt, (35, 350))
 
 		pygame.display.update()
 
 		for event in pygame.event.get():
-				if event.type == pygame.QUIT:
-					run = False
-				else:
-					keys = pygame.key.get_pressed()
+			if event.type == pygame.QUIT:
+				run = False
+			else:
+				keys = pygame.key.get_pressed()
 
-					for key in keys:
-						if keys[pygame.K_RETURN]:
-							run = False
-							start = True
-
+				if keys[pygame.K_RETURN]:
+					run, start = False, True
 
 	return start
 
 
 def gameOver(surface, score):
 	surface.fill((0, 0, 0))
-	fnt1 = pygame.font.SysFont('cambria', 72)
-	fnt2 = pygame.font.SysFont('cambria', 32)
 
-	run = True
+	title = font72.render('Game Over', True, (255, 0, 0))
+	prompt = font32.render('Your Score: '+str(score), True, (0, 0, 255))
 
-	title = fnt1.render('Game Over', True, (255, 0, 0))
-	surface.blit(title, (70, 100))
-
-	prompt =  fnt2.render('Your Score: {}'.format(score), True, (0, 0, 255))
+	surface.blit(title, (80, 100))
 	surface.blit(prompt, (130, 300))
 
 	pygame.display.update()
 
-	pygame.time.delay(1100)
+	pygame.time.delay(1200)
 	pygame.time.Clock().tick(5)
 
 	if startMenu(win):
 		gamePlay(win)
 
 
-
 def gamePlay(surface):
-	global snk, s, font
+	global snk, s
 	s.reset((10, 10))
 	run = True
 	while run:
@@ -240,22 +209,17 @@ def gamePlay(surface):
 			for x in range(len(s.body)):
 				if s.body[x].pos in list(map(lambda z:z.pos, s.body[x+1:])):
 					gameOver(win, len(s.body)-3)
-					run = False
-					break
+					run = False; break
 			redrawWindow(surface)
 		else:
 			run = False
 
 
-width = 500
-rows = 20
+width, rows = 500, 20
 s = Snake((255, 0, 0), (10, 10))
-s.addCube()
-s.addCube()
+s.addCube(); s.addCube()
 snk = Cube(snack(rows, s), (255, 0, 0))
 clock = pygame.time.Clock()
-
-font = pygame.font.SysFont('cambria', 32)
 
 if startMenu(win):
 	gamePlay(win)
