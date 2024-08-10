@@ -10,46 +10,64 @@ font32 = pygame.font.SysFont('cambria', 32)
 font42 = pygame.font.SysFont('cambria', 42)
 font72 = pygame.font.SysFont('cambria', 72)
 
+
 def draw(lst):
     for i in range(len(lst)):
         for j in range(len(lst[i])):
             if lst[i][j] != 0:
-                x = j*100 if 1 <= j <= 3 else 0
-                y = i*100 if 1 <= i <= 3 else 0
+                x = j * 100 if 1 <= j <= 3 else 0
+                y = i * 100 if 1 <= i <= 3 else 0
 
                 pygame.draw.rect(win, colour(lst[i][j]), (x, y, 100, 100))
 
                 title = font42.render(str(lst[i][j]), True, (255, 255, 255))
 
-                if len(str(lst[i][j])) == 4: z = 0 # four digit number
-                elif len(str(lst[i][j])) == 3: z = 15 # triple digit number
-                elif len(str(lst[i][j])) == 2: z = 25 # double digit number
-                elif len(str(lst[i][j])) == 1: z = 35 # single digit number
+                if len(str(lst[i][j])) == 4:
+                    z = 0  # four digit number
+                elif len(str(lst[i][j])) == 3:
+                    z = 15  # triple digit number
+                elif len(str(lst[i][j])) == 2:
+                    z = 25  # double digit number
+                elif len(str(lst[i][j])) == 1:
+                    z = 35  # single digit number
 
-                win.blit(title, (x+z, y+20))
+                win.blit(title, (x + z, y + 20))
 
 
 def colour(num):
     clr = (0, 0, 0)
-    if num == 2: clr = (255, 0, 0)
-    elif num == 4: clr = (255, 128, 0)
-    elif num == 8: clr = (255, 255, 0)
-    elif num == 16: clr = (128, 255, 0)
-    elif num == 32: clr = (0, 255, 0)
-    elif num == 64: clr = (0, 255, 128)
-    elif num == 128: clr = (0, 255, 255)
-    elif num == 256: clr = (0, 128, 255)
-    elif num == 512: clr = (0, 0, 255)
-    elif num == 1024: clr = (127, 0, 255)
-    elif num == 2048: clr = (255, 0, 255)
-    elif num == 4096: clr = (255, 0, 127)
-    elif num == 8192: clr = (128, 128, 128)
+    if num == 2:
+        clr = (255, 0, 0)
+    elif num == 4:
+        clr = (255, 128, 0)
+    elif num == 8:
+        clr = (255, 255, 0)
+    elif num == 16:
+        clr = (128, 255, 0)
+    elif num == 32:
+        clr = (0, 255, 0)
+    elif num == 64:
+        clr = (0, 255, 128)
+    elif num == 128:
+        clr = (0, 255, 255)
+    elif num == 256:
+        clr = (0, 128, 255)
+    elif num == 512:
+        clr = (0, 0, 255)
+    elif num == 1024:
+        clr = (127, 0, 255)
+    elif num == 2048:
+        clr = (255, 0, 255)
+    elif num == 4096:
+        clr = (255, 0, 127)
+    elif num == 8192:
+        clr = (128, 128, 128)
 
     return clr
 
 
 def drawGrid(w, rows, surface):
-    sizeBtwn = w//rows
+    sizeBtwn = w // rows
     x = y = 0
 
     for l in range(rows):
@@ -76,7 +94,8 @@ def isGameOver(lst):
     for i in range(len(lst)):
         for j in range(len(lst[i])):
             if lst[i][j] == 0:
-                run = True; break
+                run = True
+                break
 
         if run: break
 
@@ -84,10 +103,10 @@ def isGameOver(lst):
         for i in range(len(lst)):
             for j in range(len(lst[i])):
                 run = (
-                    (j != 0 and lst[i][j] == lst[i][j-1]) or 
-                    (i != 0 and lst[i][j] == lst[i-1][j]) or 
-                    (j != 3 and lst[i][j] == lst[i][j+1]) or
-                    (i != 3 and lst[i][j] == lst[i+1][j])
+                        (j != 0 and lst[i][j] == lst[i][j - 1]) or
+                        (i != 0 and lst[i][j] == lst[i - 1][j]) or
+                        (j != 3 and lst[i][j] == lst[i][j + 1]) or
+                        (i != 3 and lst[i][j] == lst[i + 1][j])
                 )
                 if run: break
 
@@ -263,7 +282,7 @@ def gameOver(surface, score):
     surface.fill((0, 0, 0))
 
     title = font72.render('Game Over', True, (255, 0, 0))
-    prompt = font32.render('Your Score: '+str(score), True, (0, 0, 255))
+    prompt = font32.render('Your Score: ' + str(score), True, (0, 0, 255))
     surface.blit(title, (30, 100))
     surface.blit(prompt, (100, 200))
 
@@ -278,8 +297,8 @@ score = 0
 
 x1 = x2 = y2 = y2 = 0
 while True:
-    x1, y1 = randint(0,3), randint(0,3)
-    x2, y2 = randint(0,3), randint(0,3)
+    x1, y1 = randint(0, 3), randint(0, 3)
+    x2, y2 = randint(0, 3), randint(0, 3)
     if x1 != x2 or y1 != y2: break
 
 lst[x1][y1] = lst[x2][y2] = 2
@@ -314,7 +333,8 @@ while run:
                 break
 
     win.fill((0, 0, 0))
-    drawGrid(400, 4, win); draw(lst)
+    drawGrid(400, 4, win)
+    draw(lst)
     if not isGameOver(lst):
         run = False
         gameOver(win, score)

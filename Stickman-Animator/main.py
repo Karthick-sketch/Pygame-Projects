@@ -1,34 +1,40 @@
-import pygame, glob, os.path
+import glob
+import os.path
+import pygame
 from pygame.locals import *
+
 from interface import Button, Input
 from person import Person
 from projectManager import ProjectManager
 
-# Initialize program
 pygame.init()
 
 displayInfo = pygame.display.Info()
-width, height = displayInfo.current_w, displayInfo.current_h-55
+# width, height = displayInfo.current_w, displayInfo.current_h - 55
+width, height = 1200, 900
 
-pygame.display.set_caption("Stickman Animator")
+pygame.display.set_caption("Stick-Man Animator")
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 24)
 defaultPadding = (4, 4, 4, 4)
 
-def mainMenu(mm):
-    window = pygame.display.set_mode((600, 800))
+
+def main_menu(mm):
+    main_menu_window = pygame.display.set_mode((600, 800))
 
     run, start = True, False
-    textField = Input(pygame, window, (20, 50, 450, 30), 24, padding=defaultPadding)
-    createProject = Button(pygame, window, "Create", (500, 50), 24, padding=defaultPadding)
+    text_field = Input(pygame, main_menu_window, (20, 50, 450, 30), 24, padding=defaultPadding)
+    create_project = Button(pygame, main_menu_window, "Create", (500, 50), 24, padding=defaultPadding)
 
-    recentProjects = {}; row = 100
-    for project in glob.glob('*.stm'):
-        recentProjects[project] = Button(
-            pygame, window, project[:-4], (20, row), 24,
+    recent_projects = {}
+    row = 100
+    for project in glob.glob('Stickman-Animator/*.stm'):
+        print(project)
+        recent_projects[project] = Button(
+            pygame, main_menu_window, project[18:-4], (20, row), 24,
             padding=(16, 20, 8, 225),
-            backgroundColor=(255, 255, 255),
-            borderColor=(50, 50, 50)
+            background_color=(255, 255, 255),
+            border_color=(50, 50, 50)
         )
         row += 60
 
@@ -37,105 +43,108 @@ def mainMenu(mm):
         for event in pygame.event.get():
             if event.type == QUIT:
                 run = False
-            elif textField.focus and event.type == pygame.KEYDOWN:
-                textField.text = textField.text[:-1] if (event.key == pygame.K_BACKSPACE) else (textField.text + event.unicode)
+            elif text_field.focus and event.type == pygame.KEYDOWN:
+                text_field.text = text_field.text[:-1] if (event.key == pygame.K_BACKSPACE) else (
+                            text_field.text + event.unicode)
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                if textField.click():
-                    textField.focus = True
-                elif createProject.click() and textField.text != '':
-                    mm.setProject(textField.text, os.path)
-                    run = textField.focus = False
+                if text_field.click():
+                    text_field.focus = True
+                elif create_project.click() and text_field.text != '':
+                    mm.setProject(text_field.text, os.path)
+                    run = text_field.focus = False
                     start = True
                 else:
-                    for name, project in recentProjects.items():
+                    for name, project in recent_projects.items():
                         if project.click():
-                            mm.setProject(name[:-4], os.path)
-                            run = textField.focus = False
+                            mm.set_project(name[:-4], os.path)
+                            run = text_field.focus = False
                             start = True
 
-        window.fill((255, 255, 255))
+        main_menu_window.fill((255, 255, 255))
 
         label = font.render("Create new project", True, pygame.Color('Black'))
-        window.blit(label, (20, 10))
+        main_menu_window.blit(label, (20, 10))
 
-        textField.show()
-        createProject.show()
+        text_field.show()
+        create_project.show()
 
-        for project in recentProjects.values():
+        for project in recent_projects.values():
             project.show()
 
     return start
 
 
 projectManager = ProjectManager()
-if mainMenu(projectManager):
+if main_menu(projectManager):
     window = pygame.display.set_mode((width, height))
 
-    frames = [] # Frames
-    for frame in projectManager.getKeyFrames():
+    frames = []  # Frames
+    for frame in projectManager.get_key_frames():
         person = Person(pygame, window, True)
         for name, part in frame.items():
-            person.customPerson(name, part[0], part[1], part[2], part[3], name=="HEAD")
+            person.custom_person(name, part[0], part[1], part[2], part[3], name == "HEAD")
 
-        person.setChildrenToTheRespectPart()
+        person.set_children_to_the_respect_part()
         frames.append(person)
 
     frames = frames if len(frames) > 0 else [Person(pygame, window)]
     person = frames[0]
 
     # Buttons
-    createKeyFrame = Button(pygame, window, "Create keyframe", (width/2-185, height-50), 24, padding=defaultPadding)
-    addKeyFrame = Button(pygame, window, "Add keyframe", (width/2, height-50), 24, padding=defaultPadding)
-    play = Button(pygame, window, "Play", (width/2-60, 50), 24, padding=defaultPadding)
-    pause = Button(pygame, window, "Pause", (width/2, 50), 24, padding=defaultPadding)
+    createKeyFrame = Button(pygame, window, "Create keyframe", (width / 2 - 185, height - 50), 24,
+                            padding=defaultPadding)
+    add_key_frame = Button(pygame, window, "Add keyframe", (width / 2, height - 50), 24, padding=defaultPadding)
+    play = Button(pygame, window, "Play", (width / 2 - 60, 50), 24, padding=defaultPadding)
+    pause = Button(pygame, window, "Pause", (width / 2, 50), 24, padding=defaultPadding)
 
     # Key frames
-    keyFrames = [Button(pygame, window, " . ", (width/2-100, height-100), 24)]
-    keyFrames[0].select(True)
-    selectedKeyFrame = [0, keyFrames[0]]
+    key_frames = [Button(pygame, window, " . ", (width / 2 - 100, height - 100), 24)]
+    key_frames[0].select(True)
+    selected_key_frame = [0, key_frames[0]]
 
     for i in range(1, len(frames)):
-        keyFrames.append(Button(pygame, window, " . ", (keyFrames[-1].x+30, keyFrames[-1].y), 24))
+        key_frames.append(Button(pygame, window, " . ", (key_frames[-1].x + 30, key_frames[-1].y), 24))
 
     # Beginning Game Loop
-    animate = False; f = 0
+    animate = False
+    f = 0
     running = True
     while running:
         if animate:
             person = frames[f]
-            f = f+1 if f+1 < len(frames) else 0
+            f = f + 1 if f + 1 < len(frames) else 0
             pygame.time.delay(200)
 
         pygame.display.update()
         for event in pygame.event.get():
             if event.type == QUIT:
-                projectManager.storeKeyFrames(frames)
+                projectManager.store_key_frames(frames)
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN and play.click():
                 animate = True
-                print('Ada')
             elif event.type == pygame.MOUSEBUTTONDOWN and pause.click():
                 animate = False
-                person = frames[selectedKeyFrame[0]]
+                person = frames[selected_key_frame[0]]
             elif not animate:
                 if event.type == pygame.MOUSEBUTTONDOWN and createKeyFrame.click():
-                    keyFrames.append(Button(pygame, window, " . ", (keyFrames[-1].x+30, keyFrames[-1].y), 24))
-                elif event.type == pygame.MOUSEBUTTONDOWN and addKeyFrame.click():
-                    if  selectedKeyFrame[0] < len(frames):
-                        frames[selectedKeyFrame[0]] = person
+                    key_frames.append(Button(pygame, window, " . ", (key_frames[-1].x + 30, key_frames[-1].y), 24))
+                elif event.type == pygame.MOUSEBUTTONDOWN and add_key_frame.click():
+                    if selected_key_frame[0] < len(frames):
+                        frames[selected_key_frame[0]] = person
                     else:
                         frames.append(person)
                 else:
-                    for i, kf in enumerate(keyFrames):
+                    for i, kf in enumerate(key_frames):
                         if event.type == pygame.MOUSEBUTTONDOWN and kf.click():
-                            selectedKeyFrame[1].select(False)
+                            selected_key_frame[1].select(False)
                             kf.select(True)
-                            selectedKeyFrame = [i, kf]
+                            selected_key_frame = [i, kf]
                             person = frames[i] if i < len(frames) else frames[-1].copy()
                             break
 
                     for part in person.BODY_PARTS.values():
-                        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and part.bone.collidepoint(event.pos):
+                        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and part.bone.collidepoint(
+                                event.pos):
                             part.bone.drag = True
                             mouse_x, mouse_y = event.pos
                             offset_x = part.bone.x - mouse_x
@@ -149,14 +158,15 @@ if mainMenu(projectManager):
 
         window.fill((255, 255, 255))
 
-        play.show(); pause.show()
+        play.show()
+        pause.show()
         person.draw()
 
         if not animate:
             createKeyFrame.show()
-            addKeyFrame.show()
+            add_key_frame.show()
 
-            for kf in keyFrames:
+            for kf in key_frames:
                 kf.show()
 
         pygame.display.flip()

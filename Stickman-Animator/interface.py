@@ -1,36 +1,35 @@
 class Container:
-    def __init__(self, pygame, win, text, pos, fontSize, padding, fontColor, borderColor, borderSize):
+    def __init__(self, pygame, win, text, pos, font_size, padding, font_color, border_color, border_size):
         self.pygame = pygame
         self.window = win
         self.text = text
         self.x, self.y = pos
-        self.paddingTop, self.paddingBottom = padding[0], padding[1]*2
-        self.paddingLeft, self.paddingRight = padding[2], padding[3]*2
-        self.font = self.pygame.font.SysFont("Arial", fontSize)
-        self.color = fontColor
-        self.borderColor, self.borderSize = borderColor, borderSize
+        self.paddingTop, self.padding_bottom = padding[0], padding[1] * 2
+        self.paddingLeft, self.padding_right = padding[2], padding[3] * 2
+        self.font = self.pygame.font.SysFont("Arial", font_size)
+        self.color = font_color
+        self.border_color, self.border_size = border_color, border_size
 
-    def draw(self, backgroundColor, size, length):
+    def draw(self, background_color, size, length):
         self.size = size
-        self.surface = self.pygame.Surface((self.size[0]+self.paddingRight, self.size[1]+self.paddingBottom))
-        self.surface.fill(backgroundColor)
+        self.surface = self.pygame.Surface((self.size[0] + self.padding_right, self.size[1] + self.padding_bottom))
+        self.surface.fill(background_color)
         self.rect = self.pygame.Rect(
-            self.x - self.borderSize,
-            self.y - self.borderSize,
-            length[0] + (self.paddingRight + self.borderSize),
-            length[1] + (self.paddingBottom + self.borderSize)
+            self.x - self.border_size,
+            self.y - self.border_size,
+            length[0] + (self.padding_right + self.border_size),
+            length[1] + (self.padding_bottom + self.border_size)
         )
 
     def show(self, size):
         self.window.blit(self.surface, (self.x, self.y))
         self.pygame.draw.rect(
             self.window,
-            self.borderColor,
-            self.pygame.Rect(self.x - self.borderSize,
-            self.y - self.borderSize,
-            size[0] + (self.paddingRight + self.borderSize),
-            size[1] + (self.paddingBottom + self.borderSize)),
-            self.borderSize
+            self.border_color,
+            self.pygame.Rect(self.x - self.border_size, self.y - self.border_size,
+                             size[0] + (self.padding_right + self.border_size),
+                             size[1] + (self.padding_bottom + self.border_size)),
+            self.border_size
         )
 
     def click(self):
@@ -39,15 +38,16 @@ class Container:
 
 
 class Button(Container):
-    def __init__(self, pygame, win, text, pos, fontSize, padding=(0, 0, 0, 0), fontColor=(0, 0, 0), backgroundColor=(211, 211, 211), borderColor=(255, 255, 255), borderSize=2):
-        super().__init__(pygame, win, text, pos, fontSize, padding, fontColor, borderColor, borderSize)
-        self.draw(backgroundColor)
+    def __init__(self, pygame, win, text, pos, font_size, padding=(0, 0, 0, 0), font_color=(0, 0, 0),
+                 background_color=(211, 211, 211), border_color=(255, 255, 255), border_size=2):
+        super().__init__(pygame, win, text, pos, font_size, padding, font_color, border_color, border_size)
+        self.draw(background_color)
 
-    def draw(self, backgroundColor):
-        self.textNode = self.font.render(self.text, True, self.color)
-        self.size = self.textNode.get_size()
-        super().draw(backgroundColor, self.size, (self.x, self.y))
-        self.surface.blit(self.textNode, (self.paddingLeft, self.paddingTop))
+    def draw(self, background_color):
+        self.text_node = self.font.render(self.text, True, self.color)
+        self.size = self.text_node.get_size()
+        super().draw(background_color, self.size, (self.x, self.y))
+        self.surface.blit(self.text_node, (self.paddingLeft, self.paddingTop))
 
     def show(self):
         super().show(self.size)
@@ -57,17 +57,19 @@ class Button(Container):
 
 
 class Input(Container):
-    def __init__(self, pygame, win, pos, fontSize, padding=(0, 0, 0, 0), fontColor=(0, 0, 0), backgroundColor=(255, 255, 255), borderColor=(100, 100, 100), borderSize=2):
-        super().__init__(pygame, win, '', (pos[0], pos[1]), fontSize, padding, fontColor, borderColor, borderSize)
-        self.backgroundColor = backgroundColor
-        self.focus = False; self.length = (pos[2], pos[3])
+    def __init__(self, pygame, win, pos, font_size, padding=(0, 0, 0, 0), font_color=(0, 0, 0),
+                 background_color=(255, 255, 255), border_color=(100, 100, 100), border_size=2):
+        super().__init__(pygame, win, '', (pos[0], pos[1]), font_size, padding, font_color, border_color, border_size)
+        self.background_color = background_color
+        self.focus = False;
+        self.length = (pos[2], pos[3])
         self.draw()
 
     def draw(self):
-        self.textNode = self.font.render(self.text, True, self.color)
-        self.size = self.textNode.get_size()
-        super().draw(self.backgroundColor, self.size, self.length)
-        self.surface.blit(self.textNode, (self.paddingLeft, self.paddingTop))
+        self.text_node = self.font.render(self.text, True, self.color)
+        self.size = self.text_node.get_size()
+        super().draw(self.background_color, self.size, self.length)
+        self.surface.blit(self.text_node, (self.paddingLeft, self.paddingTop))
 
     def show(self):
         if self.focus:
