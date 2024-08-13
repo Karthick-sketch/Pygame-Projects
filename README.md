@@ -4,5 +4,5 @@
 ## Snake Game
 ![Snake Game](/Snake-Game/SnakeGame.jpeg)
 
-## Stick-man Animator
+## Stick-Man Animator
 ![Stick-man Animator](/Stickman-Animator/stickman.png)

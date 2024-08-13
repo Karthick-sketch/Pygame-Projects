@@ -14,14 +14,14 @@ class Cube(object):
 
     def __init__(self, start, color=(0, 255, 0)):
         self.pos = start
-        self.dirx, self.diry = 1, 0
+        self.dir_x, self.dir_y = 1, 0
         self.color = color
 
-    def move(self, dirx, diry):
-        self.dirx, self.diry = dirx, diry
-        self.pos = (self.pos[0] + dirx, self.pos[1] + diry)
+    def move(self, dir_x, dir_y) -> None:
+        self.dir_x, self.dir_y = dir_x, dir_y
+        self.pos = (self.pos[0] + dir_x, self.pos[1] + dir_y)
 
-    def draw(self, surface, eyes=False):
+    def draw(self, surface, eyes=False) -> None:
         dis = self.w // self.rows
         i, j = self.pos[0], self.pos[1]
 
@@ -29,10 +29,10 @@ class Cube(object):
 
         if eyes:
             centre, radius = dis // 2, 3
-            circleMiddle = (i * dis + centre - radius, j * dis + 8)
-            circleMiddle2 = (i * dis + dis - radius * 2, j * dis + 8)
-            pygame.draw.circle(surface, (0, 0, 0), circleMiddle, radius)
-            pygame.draw.circle(surface, (0, 0, 0), circleMiddle2, radius)
+            circle_middle = (i * dis + centre - radius, j * dis + 8)
+            circle_middle2 = (i * dis + dis - radius * 2, j * dis + 8)
+            pygame.draw.circle(surface, (0, 0, 0), circle_middle, radius)
+            pygame.draw.circle(surface, (0, 0, 0), circle_middle2, radius)
 
 
 class Snake(object):
@@ -41,62 +41,60 @@ class Snake(object):
         self.head = Cube(pos)
         self.body = [self.head]
         self.turns = {}
-        self.dirx = self.diry = 0
+        self.dir_x = self.dir_y = 0
 
-    def move(self):
-        Continue = True
+    def move(self) -> bool:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                Continue = False
+                return False
             else:
                 keys = pygame.key.get_pressed()
 
-                if keys[pygame.K_UP] and self.diry != 1:
-                    self.dirx, self.diry = 0, -1
-                    self.turns[self.head.pos[:]] = [self.dirx, self.diry]
-                elif keys[pygame.K_DOWN] and self.diry != -1:
-                    self.dirx, self.diry = 0, 1
-                    self.turns[self.head.pos[:]] = [self.dirx, self.diry]
-                elif keys[pygame.K_LEFT] and self.dirx != 1:
-                    self.dirx, self.diry = -1, 0
-                    self.turns[self.head.pos[:]] = [self.dirx, self.diry]
-                elif keys[pygame.K_RIGHT] and self.dirx != -1:
-                    self.dirx, self.diry = 1, 0
-                    self.turns[self.head.pos[:]] = [self.dirx, self.diry]
+                if keys[pygame.K_UP] and self.dir_y != 1:
+                    self.dir_x, self.dir_y = 0, -1
+                    self.turns[self.head.pos[:]] = [self.dir_x, self.dir_y]
+                elif keys[pygame.K_DOWN] and self.dir_y != -1:
+                    self.dir_x, self.dir_y = 0, 1
+                    self.turns[self.head.pos[:]] = [self.dir_x, self.dir_y]
+                elif keys[pygame.K_LEFT] and self.dir_x != 1:
+                    self.dir_x, self.dir_y = -1, 0
+                    self.turns[self.head.pos[:]] = [self.dir_x, self.dir_y]
+                elif keys[pygame.K_RIGHT] and self.dir_x != -1:
+                    self.dir_x, self.dir_y = 1, 0
+                    self.turns[self.head.pos[:]] = [self.dir_x, self.dir_y]
 
-        if Continue:
-            for i, c in enumerate(self.body):
-                p = c.pos[:]
-                if p in self.turns:
-                    turn = self.turns[p]
-                    c.move(turn[0], turn[1])
-                    if i == len(self.body) - 1:
-                        self.turns.pop(p)
+        for i, c in enumerate(self.body):
+            p = c.pos[:]
+            if p in self.turns:
+                turn = self.turns[p]
+                c.move(turn[0], turn[1])
+                if i == len(self.body) - 1:
+                    self.turns.pop(p)
+            else:
+                if c.dir_x == -1 and c.pos[0] <= 0:
+                    c.pos = (c.rows - 1, c.pos[1])
+                elif c.dir_x == 1 and c.pos[0] >= c.rows - 1:
+                    c.pos = (0, c.pos[1])
+                elif c.dir_y == -1 and c.pos[1] <= 0:
+                    c.pos = (c.pos[0], c.rows - 1)
+                elif c.dir_y == 1 and c.pos[1] >= c.rows - 1:
+                    c.pos = (c.pos[0], 0)
                 else:
-                    if c.dirx == -1 and c.pos[0] <= 0:
-                        c.pos = (c.rows - 1, c.pos[1])
-                    elif c.dirx == 1 and c.pos[0] >= c.rows - 1:
-                        c.pos = (0, c.pos[1])
-                    elif c.diry == -1 and c.pos[1] <= 0:
-                        c.pos = (c.pos[0], c.rows - 1)
-                    elif c.diry == 1 and c.pos[1] >= c.rows - 1:
-                        c.pos = (c.pos[0], 0)
-                    else:
-                        c.move(c.dirx, c.diry)
+                    c.move(c.dir_x, c.dir_y)
 
-        return Continue
+        return True
 
-    def reset(self, pos):
+    def reset(self, pos) -> None:
         self.head = Cube(pos)
         self.body = [self.head]
-        self.addCube()
-        self.addCube()
+        self.add_square()
+        self.add_square()
         self.turns = {}
-        self.dirx = self.diry = 0
+        self.dir_x = self.dir_y = 0
 
-    def addCube(self):
+    def add_square(self) -> None:
         tail = self.body[-1]
-        dx, dy = tail.dirx, tail.diry
+        dx, dy = tail.dir_x, tail.dir_y
 
         if dx == 1 and dy == 0:
             self.body.append(Cube((tail.pos[0] - 1, tail.pos[1])))
@@ -107,15 +105,15 @@ class Snake(object):
         elif dx == 0 and dy == -1:
             self.body.append(Cube((tail.pos[0], tail.pos[1] + 1)))
 
-        self.body[-1].dirx = dx
-        self.body[-1].diry = dy
+        self.body[-1].dir_x = dx
+        self.body[-1].dir_y = dy
 
-    def draw(self, surface):
+    def draw(self, surface) -> None:
         for i, c in enumerate(self.body):
             c.draw(surface, i == 0)
 
 
-def redrawWindow(surface):
+def redraw_window(surface) -> None:
     global width, s, snk
     surface.fill((0, 0, 0))
     s.draw(surface)
@@ -127,39 +125,28 @@ def redrawWindow(surface):
     pygame.display.update()
 
 
-def snack(rows, item):
+def food(rows, item) -> tuple[int, int]:
     position = item.body
-    run = True
-    while run:
+    while True:
         pos = (randrange(rows), randrange(rows))
-        if len(list(filter(lambda z: z.pos == pos, position))) > 0:
-            continue
-        else:
-            run = False
-
-    return pos
+        if len(list(filter(lambda z: z.pos == pos, position))) <= 0:
+            return pos
 
 
-def startMenu(surface):
+def start_menu(surface) -> bool:
     surface.fill((0, 0, 0))
-    start, run = False, True
     dis = width // rows
-
-    while run:
+    while True:
         title = font72.render('Snake Game', True, (0, 255, 0))
         surface.blit(title, (60, 100))
-
         # Head
         pygame.draw.rect(surface, (0, 255, 0), (10 * dis - 25, 10 * dis + 1, dis - 2, dis - 2))
-
         # Eyes
         pygame.draw.circle(surface, (0, 0, 0), (10 * dis - 8, 10 * dis + 8), 3)
         pygame.draw.circle(surface, (0, 0, 0), (10 * dis - 17, 10 * dis + 8), 3)
-
         # Body
         pygame.draw.rect(surface, (0, 255, 0), (10 * dis - 50, 10 * dis + 1, dis - 2, dis - 2))
         pygame.draw.rect(surface, (0, 255, 0), (10 * dis - 75, 10 * dis + 1, dis - 2, dis - 2))
-
         # Food
         pygame.draw.rect(surface, (255, 0, 0), (10 * dis + 25, 10 * dis + 1, dis - 2, dis - 2))
 
@@ -170,35 +157,30 @@ def startMenu(surface):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                return False
             else:
                 keys = pygame.key.get_pressed()
-
                 if keys[pygame.K_RETURN]:
-                    run, start = False, True
-
-    return start
+                    return True
 
 
-def gameOver(surface, score):
-    surface.fill((0, 0, 0))
-
+def game_over(surface, score) -> None:
     title = font72.render('Game Over', True, (255, 0, 0))
     prompt = font32.render('Your Score: ' + str(score), True, (0, 0, 255))
 
+    surface.fill((0, 0, 0))
     surface.blit(title, (80, 100))
     surface.blit(prompt, (130, 300))
 
     pygame.display.update()
-
     pygame.time.delay(1200)
     pygame.time.Clock().tick(5)
 
-    if startMenu(win):
-        gamePlay(win)
+    if start_menu(win):
+        game_play(win)
 
 
-def gamePlay(surface):
+def game_play(surface) -> None:
     global snk, s
     s.reset((10, 10))
     run = True
@@ -207,27 +189,27 @@ def gamePlay(surface):
         clock.tick(10)
         if s.move():
             if s.body[0].pos == snk.pos:
-                s.addCube()
-                snk = Cube(snack(rows, s), (255, 0, 0))
+                s.add_square()
+                snk = Cube(food(rows, s), (255, 0, 0))
 
             for x in range(len(s.body)):
                 if s.body[x].pos in list(map(lambda z: z.pos, s.body[x + 1:])):
-                    gameOver(win, len(s.body) - 3)
+                    game_over(win, len(s.body) - 3)
                     run = False
                     break
-            redrawWindow(surface)
+            redraw_window(surface)
         else:
             run = False
 
 
 width, rows = 500, 20
 s = Snake((255, 0, 0), (10, 10))
-s.addCube()
-s.addCube()
-snk = Cube(snack(rows, s), (255, 0, 0))
+s.add_square()
+s.add_square()
+snk = Cube(food(rows, s), (255, 0, 0))
 clock = pygame.time.Clock()
 
-if startMenu(win):
-    gamePlay(win)
+if start_menu(win):
+    game_play(win)
 
 pygame.quit()

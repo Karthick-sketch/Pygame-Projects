@@ -10,8 +10,15 @@ font32 = pygame.font.SysFont('cambria', 32)
 font42 = pygame.font.SysFont('cambria', 42)
 font72 = pygame.font.SysFont('cambria', 72)
 
+INITIAL_NUMBER = 16
 
-def draw(lst):
+
+def random_square_location() -> tuple[int, int]:
+    return randint(0, 3), randint(0, 3)
+
+
+def draw(lst) -> None:
+    z = 0
     for i in range(len(lst)):
         for j in range(len(lst[i])):
             if lst[i][j] != 0:
@@ -23,18 +30,18 @@ def draw(lst):
                 title = font42.render(str(lst[i][j]), True, (255, 255, 255))
 
                 if len(str(lst[i][j])) == 4:
-                    z = 0  # four digit number
+                    z = 0  # four-digit number
                 elif len(str(lst[i][j])) == 3:
                     z = 15  # triple digit number
                 elif len(str(lst[i][j])) == 2:
-                    z = 25  # double digit number
+                    z = 25  # double-digit number
                 elif len(str(lst[i][j])) == 1:
                     z = 35  # single digit number
 
                 win.blit(title, (x + z, y + 20))
 
 
-def colour(num):
+def colour(num) -> tuple[int, int, int]:
     clr = (0, 0, 0)
     if num == 2:
         clr = (255, 0, 0)
@@ -66,56 +73,41 @@ def colour(num):
     return clr
 
 
-def drawGrid(w, rows, surface):
-    sizeBtwn = w // rows
+def draw_grid(w, rows, surface) -> None:
+    size_between = w // rows
     x = y = 0
-
-    for l in range(rows):
-        x += sizeBtwn
+    for i in range(rows):
+        x += size_between
         pygame.draw.line(surface, (255, 255, 255), (x, 0), (x, w))
-        if l < rows:
-            y += sizeBtwn
+        if i < rows:
+            y += size_between
             pygame.draw.line(surface, (255, 255, 255), (0, y), (w, y))
 
 
-def randomize(lst):
-    a, b = randint(0, 3), randint(0, 3)
-
-    i = 0
-    while lst[a][b] != 0 and i < 32:
-        a, b = randint(0, 3), randint(0, 3)
-        i += 1
-
-    if i < 32: lst[a][b] = 2
+def randomize(lst) -> None:
+    while True:
+        a, b = random_square_location()
+        if lst[a][b] == 0:
+            lst[a][b] = 2
+            break
 
 
-def isGameOver(lst):
-    run = False
+def is_game_playable(lst) -> bool:
     for i in range(len(lst)):
         for j in range(len(lst[i])):
             if lst[i][j] == 0:
-                run = True
-                break
+                return True
 
-        if run: break
+    for i in range(len(lst)):
+        for j in range(len(lst[i])):
+            if (j != 0 and lst[i][j] == lst[i][j - 1]) or (i != 0 and lst[i][j] == lst[i - 1][j]) or (
+                    j != 3 and lst[i][j] == lst[i][j + 1]) or (i != 3 and lst[i][j] == lst[i + 1][j]):
+                return True
 
-    if not run:
-        for i in range(len(lst)):
-            for j in range(len(lst[i])):
-                run = (
-                        (j != 0 and lst[i][j] == lst[i][j - 1]) or
-                        (i != 0 and lst[i][j] == lst[i - 1][j]) or
-                        (j != 3 and lst[i][j] == lst[i][j + 1]) or
-                        (i != 3 and lst[i][j] == lst[i + 1][j])
-                )
-                if run: break
-
-            if run: break
-
-    return run
+    return False
 
 
-def left(lst):
+def left(lst) -> int:
     score = 0
     for i in range(len(lst)):
         for j in range(len(lst)):
@@ -150,7 +142,7 @@ def left(lst):
     return score
 
 
-def up(lst):
+def up(lst) -> int:
     score = 0
     for i in range(len(lst)):
         for j in range(len(lst)):
@@ -185,7 +177,7 @@ def up(lst):
     return score
 
 
-def right(lst):
+def right(lst) -> int:
     score = 0
     for i in range(len(lst)):
         for j in range(len(lst)):
@@ -220,7 +212,7 @@ def right(lst):
     return score
 
 
-def down(lst):
+def down(lst) -> int:
     score = 0
     for i in range(len(lst)):
         for j in range(len(lst)):
@@ -255,12 +247,11 @@ def down(lst):
     return score
 
 
-def startMenu(surface, width, rows):
+def start_menu(surface) -> bool:
     surface.fill((0, 0, 0))
-    start, run = False, True
-    while run:
+    while True:
         title = font72.render('2048', True, (255, 0, 0))
-        prompt = font24.render('Press ENTER to start the game...', True, (255, 255, 255))
+        prompt = font24.render('Press ENTER to start the game...', True, (225, 225, 225))
         surface.blit(title, (130, 100))
         surface.blit(prompt, (40, 250))
 
@@ -268,17 +259,14 @@ def startMenu(surface, width, rows):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                return False
             else:
                 keys = pygame.key.get_pressed()
-
                 if keys[pygame.K_RETURN]:
-                    run, start = False, True
-
-    return start
+                    return True
 
 
-def gameOver(surface, score):
+def game_over(surface, score) -> None:
     surface.fill((0, 0, 0))
 
     title = font72.render('Game Over', True, (255, 0, 0))
@@ -292,18 +280,17 @@ def gameOver(surface, score):
     pygame.time.Clock().tick(5)
 
 
-lst = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
+square = [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
 score = 0
 
-x1 = x2 = y2 = y2 = 0
 while True:
-    x1, y1 = randint(0, 3), randint(0, 3)
-    x2, y2 = randint(0, 3), randint(0, 3)
-    if x1 != x2 or y1 != y2: break
+    x1, y1 = random_square_location()
+    x2, y2 = random_square_location()
+    if x1 != x2 or y1 != y2:
+        square[x1][y1] = square[x2][y2] = INITIAL_NUMBER
+        break
 
-lst[x1][y1] = lst[x2][y2] = 2
-
-run = startMenu(win, 400, 4)
+run = start_menu(win)
 while run:
     pygame.display.update()
     pygame.time.delay(50)
@@ -314,29 +301,28 @@ while run:
             run = False
         else:
             keys = pygame.key.get_pressed()
-
             if keys[pygame.K_UP]:
-                score += up(lst)
-                randomize(lst)
+                score += up(square)
+                randomize(square)
                 break
             elif keys[pygame.K_DOWN]:
-                score += down(lst)
-                randomize(lst)
+                score += down(square)
+                randomize(square)
                 break
             elif keys[pygame.K_LEFT]:
-                score += left(lst)
-                randomize(lst)
+                score += left(square)
+                randomize(square)
                 break
             elif keys[pygame.K_RIGHT]:
-                score += right(lst)
-                randomize(lst)
+                score += right(square)
+                randomize(square)
                 break
 
     win.fill((0, 0, 0))
-    drawGrid(400, 4, win)
-    draw(lst)
-    if not isGameOver(lst):
+    draw_grid(400, 4, win)
+    draw(square)
+    if not is_game_playable(square):
         run = False
-        gameOver(win, score)
+        game_over(win, score)
 
 pygame.quit()
